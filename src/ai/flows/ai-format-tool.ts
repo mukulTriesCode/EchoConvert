@@ -54,7 +54,13 @@ const recommendAudioFormatFlow = ai.defineFlow(
     outputSchema: RecommendAudioFormatOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    const result = await prompt(input);
+    const output = result.output;
+
+    if (!output) {
+      throw new Error('The AI failed to generate a recommendation. Please try again.');
+    }
+
+    return output;
   }
 );
