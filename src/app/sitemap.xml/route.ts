@@ -12,6 +12,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/tools/audio-trimmer',
     '/tools/audio-compressor',
     '/tools/volume-booster',
+    '/about',
+    '/contact',
     '/privacy-policy',
     '/terms',
   ]

@@ -48,7 +48,7 @@ export default function Home() {
   return (
     <div className="container mx-auto px-4 py-8">
       <section className="text-center py-16">
-        <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-foreground">
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
           The Ultimate Online Audio Toolkit
         </h1>
         <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
