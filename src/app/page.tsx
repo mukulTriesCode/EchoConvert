@@ -9,13 +9,12 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <main className="flex-1 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="space-y-2 mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">AI Format Tool</h1>
-          <p className="text-muted-foreground">
-            Upload your audio file and describe its use case to get an expert
-            recommendation on the best format and settings.
+    <main className="flex-1 p-4 sm:p-6 lg:p-8 flex items-center justify-center">
+      <div className="w-full max-w-2xl">
+        <div className="space-y-2 mb-8 text-center">
+          <h1 className="text-4xl font-bold tracking-tight">AI Format Tool</h1>
+          <p className="text-lg text-muted-foreground">
+            Let our AI find the perfect format and settings for your audio.
           </p>
         </div>
         <AIFormatToolClient />

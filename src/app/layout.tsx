@@ -53,7 +53,6 @@ export default function RootLayout({
               <SidebarNav />
             </SidebarContent>
             <SidebarFooter>
-              <AdPlaceholder className="h-48" />
             </SidebarFooter>
           </Sidebar>
           <SidebarInset>

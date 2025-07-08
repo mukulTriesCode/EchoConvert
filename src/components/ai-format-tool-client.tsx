@@ -25,10 +25,9 @@ import {
   WandSparkles,
   Settings,
   Lightbulb,
+  RotateCcw,
 } from 'lucide-react';
-import { Skeleton } from './ui/skeleton';
 import { cn } from '@/lib/utils';
-import { AdPlaceholder } from './ad-placeholder';
 
 const fileToDataUri = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -87,13 +86,19 @@ export function AIFormatToolClient() {
     }
   };
 
+  const handleReset = () => {
+    setFile(null);
+    setUseCase('');
+    setResult(null);
+    setError(null);
+  };
+
   const handleSubmit = async () => {
     if (!file || !useCase) {
       setError('Please upload a file and describe the use case.');
       return;
     }
     setError(null);
-    setResult(null);
 
     startTransition(async () => {
       try {
@@ -104,7 +109,8 @@ export function AIFormatToolClient() {
         });
         setResult(response);
       } catch (e) {
-        const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+        const errorMessage =
+          e instanceof Error ? e.message : 'An unknown error occurred.';
         setError(errorMessage);
         toast({
           variant: 'destructive',
@@ -116,29 +122,94 @@ export function AIFormatToolClient() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <div className="lg:col-span-2">
-        <Card>
+    <Card className="w-full shadow-lg">
+      {isPending ? (
+        <CardContent className="flex flex-col items-center justify-center p-24 space-y-4">
+          <Loader2 className="w-16 h-16 animate-spin text-primary" />
+          <p className="text-lg text-muted-foreground font-medium">
+            Analyzing your audio...
+          </p>
+          <p className="text-sm text-muted-foreground">
+            This may take a moment.
+          </p>
+        </CardContent>
+      ) : result ? (
+        <>
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <span className="p-2 bg-primary/10 rounded-full">
+                <WandSparkles className="w-6 h-6 text-primary" />
+              </span>
+              <div>
+                <CardTitle className="text-2xl">AI Recommendation</CardTitle>
+                <CardDescription>
+                  Based on your file and use case, here's our suggestion.
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="p-4 rounded-lg bg-muted/50 border">
+              <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2 mb-1">
+                <FileAudio className="w-4 h-4" /> Recommended Format
+              </h3>
+              <p className="text-xl font-bold text-primary">
+                {result.recommendedFormat}
+              </p>
+            </div>
+            <div className="p-4 rounded-lg bg-muted/50 border">
+              <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2 mb-1">
+                <Settings className="w-4 h-4" /> Recommended Settings
+              </h3>
+              <p className="text-lg font-medium">
+                {result.recommendedSettings}
+              </p>
+            </div>
+            <div className="p-4 rounded-lg bg-muted/50 border">
+              <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2 mb-1">
+                <Lightbulb className="w-4 h-4" /> Reasoning
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {result.reasoning}
+              </p>
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button onClick={handleReset} variant="outline" className="ml-auto">
+              <RotateCcw className="mr-2 h-4 w-4" />
+              Start Over
+            </Button>
+          </CardFooter>
+        </>
+      ) : (
+        <>
           <CardHeader>
             <CardTitle>Audio Analysis</CardTitle>
             <CardDescription>
-              Upload your file and provide details to get your recommendation.
+              Upload your audio file and tell us what you'll use it for.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="audio-upload">Audio File</Label>
+              <Label htmlFor="audio-upload">1. Upload Audio File</Label>
               {file ? (
-                <div className="flex items-center justify-between p-3 rounded-md border bg-muted/50">
+                <div className="flex items-center justify-between p-3 pl-4 rounded-lg border bg-secondary/50">
                   <div className="flex items-center gap-3">
                     <FileAudio className="w-6 h-6 text-primary" />
-                    <span className="font-medium text-sm truncate max-w-xs">{file.name}</span>
+                    <div className="flex flex-col">
+                      <span className="font-medium text-sm truncate max-w-xs">
+                        {file.name}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {(file.size / 1024 / 1024).toFixed(2)} MB
+                      </span>
+                    </div>
                   </div>
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => setFile(null)}
-                    className="h-7 w-7"
+                    className="h-8 w-8"
                   >
                     <X className="w-4 h-4" />
                   </Button>
@@ -150,29 +221,39 @@ export function AIFormatToolClient() {
                   onDragOver={handleDragOver}
                   onDrop={handleDrop}
                   className={cn(
-                    "relative flex flex-col items-center justify-center p-8 rounded-lg border-2 border-dashed transition-colors",
-                    isDragging ? "border-primary bg-accent/50" : "hover:border-primary/50"
+                    'relative flex flex-col items-center justify-center p-10 rounded-lg border-2 border-dashed transition-colors',
+                    isDragging
+                      ? 'border-primary bg-primary/10'
+                      : 'hover:border-primary/50'
                   )}
                 >
-                  <UploadCloud className="w-12 h-12 text-muted-foreground mb-4" />
+                  <UploadCloud className="w-12 h-12 text-primary" />
                   <p className="text-center text-muted-foreground">
-                    <label htmlFor="file-upload" className="font-semibold text-primary cursor-pointer hover:underline">
+                    <label
+                      htmlFor="file-upload"
+                      className="font-semibold text-primary cursor-pointer hover:underline"
+                    >
                       Click to upload
-                    </label> or drag and drop
+                    </label>{' '}
+                    or drag and drop
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1">MP3, WAV, OGG, AAC, etc.</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    MP3, WAV, OGG, AAC, etc.
+                  </p>
                   <input
                     id="file-upload"
                     type="file"
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     accept="audio/*"
-                    onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
+                    onChange={(e) =>
+                      handleFileChange(e.target.files?.[0] ?? null)
+                    }
                   />
                 </div>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="use-case">Use Case Description</Label>
+              <Label htmlFor="use-case">2. Describe Use Case</Label>
               <Textarea
                 id="use-case"
                 value={useCase}
@@ -183,95 +264,19 @@ export function AIFormatToolClient() {
               />
             </div>
           </CardContent>
-          <CardFooter className="flex justify-between items-center">
-            {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button onClick={handleSubmit} disabled={isPending || !file || !useCase} className="ml-auto">
-              {isPending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <WandSparkles className="mr-2 h-4 w-4" />
-              )}
-              Recommend
+          <CardFooter className="flex flex-col items-stretch gap-4">
+            {error && (
+              <p className="w-full text-sm text-destructive text-center p-2 bg-destructive/10 rounded-md">
+                {error}
+              </p>
+            )}
+            <Button onClick={handleSubmit} disabled={!file || !useCase}>
+              <WandSparkles className="mr-2 h-4 w-4" />
+              Get Recommendation
             </Button>
           </CardFooter>
-        </Card>
-      </div>
-
-      <div className="lg:col-span-1 space-y-8">
-        {isPending ? (
-          <Card>
-            <CardHeader>
-              <Skeleton className="h-6 w-3/4" />
-              <Skeleton className="h-4 w-1/2" />
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Skeleton className="h-5 w-1/4" />
-                <Skeleton className="h-8 w-1/2" />
-              </div>
-              <div className="space-y-2">
-                <Skeleton className="h-5 w-1/3" />
-                <Skeleton className="h-8 w-3/4" />
-              </div>
-              <div className="space-y-2">
-                <Skeleton className="h-5 w-1/4" />
-                <Skeleton className="h-12 w-full" />
-              </div>
-            </CardContent>
-          </Card>
-        ) : result ? (
-          <Card className="bg-accent/20 border-accent">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <WandSparkles className="w-6 h-6 text-primary" />
-                AI Recommendation
-              </CardTitle>
-              <CardDescription>
-                Based on your file and use case, here's our suggestion.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2 mb-1">
-                  <FileAudio className="w-4 h-4" /> Recommended Format
-                </h3>
-                <p className="text-lg font-bold text-primary">
-                  {result.recommendedFormat}
-                </p>
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2 mb-1">
-                  <Settings className="w-4 h-4" /> Recommended Settings
-                </h3>
-                <p className="text-md font-medium">
-                  {result.recommendedSettings}
-                </p>
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2 mb-1">
-                  <Lightbulb className="w-4 h-4" /> Reasoning
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {result.reasoning}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card className="bg-muted/50">
-            <CardHeader>
-              <CardTitle>Awaiting Input</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Your AI-powered audio format recommendation will appear here once
-                you upload a file and describe its intended use.
-              </p>
-            </CardContent>
-          </Card>
-        )}
-        <AdPlaceholder className="h-64" />
-      </div>
-    </div>
+        </>
+      )}
+    </Card>
   );
 }
